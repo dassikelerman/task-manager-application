@@ -45,21 +45,29 @@ export class Projects implements OnInit, AfterViewInit {
   }
 
   loadProjects() {
-    console.log('📁 loadProjects רץ!', 'teamId:', this.teamId()); // בדיקה
-    const id = this.teamId();
-    if (!id) return;
+  console.log('📁 loadProjects רץ!', 'teamId:', this.teamId());
+  const id = this.teamId();
+  if (!id) return;
 
-    this.isLoading.set(true);
-    this.projectsService.getProjectsByTeam(id).subscribe({
-      next: (data) => {
-        console.log('✅ קיבלנו נתונים:', data); // בדיקה
-        const filteredData = data.filter((p: Project) => p.team_id === id);
-        this.projects.set(filteredData);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false)
-    });
-  }
+  this.isLoading.set(true);
+  this.projectsService.getProjectsByTeam(id).subscribe({
+    next: (data) => {
+      console.log('✅ קיבלנו נתונים מהשרת:', data);
+      console.log('🔍 הפרויקט הראשון:', data[0]);
+      console.log('🔍 teamId שאנחנו מחפשים:', id);
+      
+      const filteredData = data.filter((p: Project) => {
+        console.log('🔎 בודק פרויקט:', p.name, 'p.team_id:', p.team_id, 'id:', id, 'שווה?', p.team_id === id);
+        return p.team_id === id;
+      });
+      
+      console.log('📦 אחרי filter:', filteredData);
+      this.projects.set(filteredData);
+      this.isLoading.set(false);
+    },
+    error: () => this.isLoading.set(false)
+  });
+}
 
   addProject(name: string, description: string) {
     const id = this.teamId();
