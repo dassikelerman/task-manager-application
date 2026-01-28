@@ -14,6 +14,14 @@ export class ProjectsService {
     return this.http.get<Project[]>(`${this.apiUrl}?teamId=${teamId}`);
   }
 
+  getProject(projectId: number): Observable<Project> {
+    return this.http.get<Project>(`${this.apiUrl}/${projectId}`);
+  }
+
+  getAllProjects(): Observable<Project[]> {
+    return this.http.get<Project[]>(this.apiUrl);
+  }
+
   createProject(teamId: number, name: string, description: string): Observable<Project> {
     return this.http.post<Project>(this.apiUrl, { teamId, name, description });
   }

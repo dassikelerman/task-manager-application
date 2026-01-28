@@ -1,7 +1,7 @@
 <div class="tasks-container" dir="rtl">
   <div class="header-section">
     <div class="page-title">
-      <a class="back-link" [routerLink]="['/teams', 1, 'projects']">
+      <a class="back-link" href="#" (click)="goBackToProjects($event)">
         → חזרה לפרויקטים
       </a>
       <h2>{{ getProjectName() }}</h2>

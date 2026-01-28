@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TasksService } from '../../services/task.service';
 import { ProjectsService } from '../../services/projects.service';
 import { Task, Comment, Project, User, PriorityLabels } from '../../models/models';
@@ -18,9 +18,11 @@ export class Tasks implements OnInit {
   private route = inject(ActivatedRoute);
   private tasksService = inject(TasksService);
   private projectsService = inject(ProjectsService);
+  private router = inject(Router);
 
   tasks = signal<Task[]>([]);
   projects = signal<Project[]>([]);
+  teamId = signal<number | null>(null);
   users = signal<User[]>([]);
   projectId = signal<number | null>(null);
   isLoading = signal(false);
@@ -46,18 +48,81 @@ export class Tasks implements OnInit {
     if (!id) return;
     
     this.isLoading.set(true);
-    
-    // טוען הכל ביחד
-    forkJoin({
-      projects: this.projectsService.getProjectsByTeam(1), // צריך את ה-teamId הנכון
-      tasks: this.tasksService.getTasksByProject(id)
-    }).subscribe({
-      next: (data) => {
-        this.projects.set(data.projects);
-        this.tasks.set(data.tasks);
-        this.isLoading.set(false);
+    // נסיון ראשון: נסו למצוא את ה-teamId ע"י בקשת כל הפרויקטים ולמצוא את הפרויקט לפי id
+    this.projectsService.getAllProjects().subscribe({
+      next: (allProjects) => {
+        const found = allProjects.find(p => p.id === id);
+        const tid = (found as any)?.team_id ?? (found as any)?.teamId ?? null;
+        if (tid) {
+          this.teamId.set(Number(tid));
+          forkJoin({
+            projects: this.projectsService.getProjectsByTeam(Number(tid)),
+            tasks: this.tasksService.getTasksByProject(id)
+          }).subscribe({
+            next: (data) => {
+              this.projects.set(data.projects);
+              this.tasks.set(data.tasks);
+              this.isLoading.set(false);
+            },
+            error: () => this.isLoading.set(false)
+          });
+        } else {
+          // אם לא נמצא team id בפרויקט, נטען רק את המשימות
+          this.tasksService.getTasksByProject(id).subscribe({
+            next: (t) => {
+              this.tasks.set(t);
+              this.isLoading.set(false);
+            },
+            error: () => this.isLoading.set(false)
+          });
+        }
       },
-      error: () => this.isLoading.set(false)
+      error: () => {
+        // במקרה של כשל בבקשה של כל הפרויקטים - נטען לפחות את המשימות
+        this.tasksService.getTasksByProject(id).subscribe({
+          next: (t) => {
+            this.tasks.set(t);
+            this.isLoading.set(false);
+          },
+          error: () => this.isLoading.set(false)
+        });
+      }
+    });
+  }
+
+  getTeamId(): number | null {
+    return this.teamId();
+  }
+
+  goBackToProjects(e: Event) {
+    e.preventDefault();
+    const tid = this.teamId();
+    const pid = this.projectId();
+    if (tid) {
+      this.router.navigate(['/teams', tid, 'projects']);
+      return;
+    }
+
+    if (!pid) {
+      // nothing we can do, fallback to teams list
+      this.router.navigate(['/teams']);
+      return;
+    }
+
+    // try to fetch project to find its team id, then navigate
+    // נסיון למצוא את ה-teamId בעזרת רשימת כל הפרויקטים
+    this.projectsService.getAllProjects().subscribe({
+      next: (allProjects) => {
+        const found = allProjects.find(p => p.id === pid);
+        const fetchedTid = (found as any)?.team_id ?? (found as any)?.teamId ?? null;
+        if (fetchedTid) {
+          this.teamId.set(Number(fetchedTid));
+          this.router.navigate(['/teams', Number(fetchedTid), 'projects']);
+        } else {
+          this.router.navigate(['/teams']);
+        }
+      },
+      error: () => this.router.navigate(['/teams'])
     });
   }
 
