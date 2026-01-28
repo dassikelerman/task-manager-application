@@ -1,11 +1,11 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router'; 
+import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router'; 
 import { ProjectsService } from '../../services/projects.service';
 import { TeamsService } from '../../services/teams.service';
 import { Project, Team } from '../../models/models';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-projects',
@@ -16,9 +16,11 @@ import { Subscription } from 'rxjs';
 })
 export class Projects implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private projectsService = inject(ProjectsService);
   private teamsService = inject(TeamsService);
   private routeSubscription?: Subscription;
+  private navigationSubscription?: Subscription;
   
   projects = signal<Project[]>([]);
   teams = signal<Team[]>([]);
@@ -29,17 +31,44 @@ export class Projects implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadTeams();
     
+    // טעינה ראשונית
+    this.loadProjectsFromRoute();
+    
+    // מאזין לשינויים בניווט - כל פעם שחוזרים לדף הזה
+    this.navigationSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      // בודק אם אנחנו בדף פרויקטים
+      if (this.router.url.includes('/teams/') && this.router.url.includes('/projects')) {
+        this.loadProjectsFromRoute();
+      }
+    });
+    
+    // מאזין גם לשינויים ב-route params
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const idFromUrl = params.get('id');
       if (idFromUrl) {
-        this.teamId.set(Number(idFromUrl));
-        this.loadProjects();
+        const newTeamId = Number(idFromUrl);
+        // רק אם ה-teamId השתנה - טוען מחדש
+        if (this.teamId() !== newTeamId) {
+          this.teamId.set(newTeamId);
+          this.loadProjects();
+        }
       }
     });
   }
 
   ngOnDestroy() {
     this.routeSubscription?.unsubscribe();
+    this.navigationSubscription?.unsubscribe();
+  }
+
+  loadProjectsFromRoute() {
+    const idFromUrl = this.route.snapshot.paramMap.get('id');
+    if (idFromUrl) {
+      this.teamId.set(Number(idFromUrl));
+      this.loadProjects();
+    }
   }
 
   loadTeams() {
@@ -52,26 +81,14 @@ export class Projects implements OnInit, OnDestroy {
     const id = this.teamId();
     if (!id) return;
 
-    if (this.projects().length === 0) {
-      this.isLoading.set(true);
-    }
+    // תמיד מראה loading כשטוען פרויקטים
+    this.isLoading.set(true);
+    // מנקה את הפרויקטים הישנים
+    this.projects.set([]);
 
     this.projectsService.getProjectsByTeam(id).subscribe({
       next: (data) => {
-        console.log('🔍 === DEBUG ===');
-        console.log('📥 נתונים שהשרת החזיר:', data);
-        console.log('🎯 teamId שאנחנו מחפשים:', id);
-        console.log('📊 כמה פרויקטים קיבלנו:', data.length);
-        
-        // בואי נבדוק כל פרויקט
-        data.forEach((p, index) => {
-          console.log(`  ${index + 1}. ${p.name} - team_id: ${p.team_id} ${p.team_id === id ? '✅' : '❌'}`);
-        });
-        
         const filteredData = data.filter((p: Project) => p.team_id === id);
-        console.log('✅ אחרי filter:', filteredData.length, 'פרויקטים');
-        console.log('🔍 === סוף DEBUG ===');
-        
         this.projects.set(filteredData);
         this.isLoading.set(false);
       },
