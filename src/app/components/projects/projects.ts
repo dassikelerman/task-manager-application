@@ -44,24 +44,20 @@ export class Projects implements OnInit, AfterViewInit {
     });
   }
 
-  loadProjects() {
-  console.log('📁 loadProjects רץ!', 'teamId:', this.teamId());
+ loadProjects() {
   const id = this.teamId();
   if (!id) return;
 
   this.isLoading.set(true);
   this.projectsService.getProjectsByTeam(id).subscribe({
     next: (data) => {
-      console.log('✅ קיבלנו נתונים מהשרת:', data);
-      console.log('📦 מעדכן signal עם:', data.length, 'פרויקטים');
-      
-      // ללא filter! רק שמים הכל!
+      // השרת כבר מחזיר רק פרויקטים של הצוות הזה!
       this.projects.set(data);
-      
-      console.log('🎯 Signal עכשיו מכיל:', this.projects().length, 'פרויקטים');
       this.isLoading.set(false);
     },
-    error: () => this.isLoading.set(false)
+    error: () => {
+      this.isLoading.set(false);
+    }
   });
 }
   addProject(name: string, description: string) {
