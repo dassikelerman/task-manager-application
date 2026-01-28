@@ -25,7 +25,6 @@ export class Projects implements OnInit, AfterViewInit {
   showAddForm = signal(false);
 
   ngOnInit() {
-    console.log('🔵 ngOnInit נטען!'); // בדיקה
     const idFromUrl = this.route.snapshot.paramMap.get('id');
     if (idFromUrl) {
       this.teamId.set(Number(idFromUrl));
@@ -35,7 +34,7 @@ export class Projects implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('🟢 ngAfterViewInit נטען!'); // בדיקה נוספת
+    // בדיקה שה-view נטען
   }
 
   loadTeams() {
@@ -44,22 +43,26 @@ export class Projects implements OnInit, AfterViewInit {
     });
   }
 
- loadProjects() {
-  const id = this.teamId();
-  if (!id) return;
+  loadProjects() {
+    const id = this.teamId();
+    if (!id) return;
 
-  this.isLoading.set(true);
-  this.projectsService.getProjectsByTeam(id).subscribe({
-    next: (data) => {
-      // השרת כבר מחזיר רק פרויקטים של הצוות הזה!
-      this.projects.set(data);
-      this.isLoading.set(false);
-    },
-    error: () => {
-      this.isLoading.set(false);
+    // רק אם אין פרויקטים - תראה loading
+    if (this.projects().length === 0) {
+      this.isLoading.set(true);
     }
-  });
-}
+
+    this.projectsService.getProjectsByTeam(id).subscribe({
+      next: (data) => {
+        this.projects.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+      }
+    });
+  }
+
   addProject(name: string, description: string) {
     const id = this.teamId();
     if (!id || !name) return;
