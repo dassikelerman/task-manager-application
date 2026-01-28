@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';  // ← הוספתי OnInit
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
@@ -11,13 +11,19 @@ import { CommonModule } from '@angular/common';
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register {
+export class Register implements OnInit {  // ← הוספתי implements OnInit
   private authService = inject(Auth);
   private router = inject(Router);
-
   name = '';
   email = '';
   password = '';
+
+  ngOnInit() {
+    // בודק אם המשתמש כבר מחובר
+    if (this.authService.isLoggedInSignal()) {
+      this.router.navigate(['/teams']);
+    }
+  }
 
   onSubmit() {
     if (this.name && this.email && this.password) {
