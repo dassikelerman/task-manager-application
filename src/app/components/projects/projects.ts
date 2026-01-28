@@ -29,7 +29,6 @@ export class Projects implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadTeams();
     
-    // מאזין לשינויים ב-route parameter
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const idFromUrl = params.get('id');
       if (idFromUrl) {
@@ -53,15 +52,26 @@ export class Projects implements OnInit, OnDestroy {
     const id = this.teamId();
     if (!id) return;
 
-    // רק אם אין פרויקטים - תראה loading
     if (this.projects().length === 0) {
       this.isLoading.set(true);
     }
 
     this.projectsService.getProjectsByTeam(id).subscribe({
       next: (data) => {
-        // סינון - רק פרויקטים של הצוות הנוכחי!
+        console.log('🔍 === DEBUG ===');
+        console.log('📥 נתונים שהשרת החזיר:', data);
+        console.log('🎯 teamId שאנחנו מחפשים:', id);
+        console.log('📊 כמה פרויקטים קיבלנו:', data.length);
+        
+        // בואי נבדוק כל פרויקט
+        data.forEach((p, index) => {
+          console.log(`  ${index + 1}. ${p.name} - team_id: ${p.team_id} ${p.team_id === id ? '✅' : '❌'}`);
+        });
+        
         const filteredData = data.filter((p: Project) => p.team_id === id);
+        console.log('✅ אחרי filter:', filteredData.length, 'פרויקטים');
+        console.log('🔍 === סוף DEBUG ===');
+        
         this.projects.set(filteredData);
         this.isLoading.set(false);
       },
