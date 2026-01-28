@@ -1,0 +1,40 @@
+<div class="auth-container" dir="rtl">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="brand-logo">M</div>
+      <h1 class="auth-title">התחברות</h1>
+      <p class="auth-subtitle">היכנס לחשבון שלך</p>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">אימייל</label>
+        <input 
+          type="email" 
+          [(ngModel)]="email" 
+          name="email"
+          placeholder="your@email.com"
+          class="form-input"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">סיסמה</label>
+        <input 
+          type="password" 
+          [(ngModel)]="password" 
+          name="password"
+          placeholder="••••••••"
+          class="form-input"
+          required>
+      </div>
+
+      <button type="submit" class="btn-submit">התחבר</button>
+    </form>
+
+    <div class="auth-footer">
+      <span>אין לך חשבון?</span>
+      <a routerLink="/register" class="auth-link">הירשם כאן</a>
+    </div>
+  </div>
+</div>

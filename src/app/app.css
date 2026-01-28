@@ -1,0 +1,10 @@
+/* מרווח עבור ההדר הקבוע */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* מרווח עליון לתוכן מתחת להדר */
+router-outlet + * {
+  padding-top: 5rem;
+}

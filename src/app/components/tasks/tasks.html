@@ -1,0 +1,303 @@
+<div class="tasks-container" dir="rtl">
+  <div class="header-section">
+    <div class="page-title">
+      <a class="back-link" [routerLink]="['/teams', 1, 'projects']">
+        → חזרה לפרויקטים
+      </a>
+      <h2>{{ getProjectName() }}</h2>
+    </div>
+    <button class="add-task-btn" (click)="showForm.set(!showForm())">
+      <span class="btn-icon">+</span>
+      <span>משימה חדשה</span>
+    </button>
+  </div>
+
+  @if (showForm()) {
+    <div class="add-task-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>משימה חדשה</h3>
+          <button class="close-btn" (click)="showForm.set(false)">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label>כותרת המשימה</label>
+            <input 
+              [(ngModel)]="newTask.title" 
+              type="text" 
+              placeholder="מה צריך לבצע?"
+              class="form-input"
+              name="taskTitle"> 
+          </div>
+
+          <div class="form-group">
+            <label>תיאור המשימה</label>
+            <textarea 
+              [(ngModel)]="newTask.description" 
+              placeholder="הוסיפי פירוט..."
+              class="form-textarea"
+              rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>עדיפות</label>
+              <select [(ngModel)]="newTask.priority" class="form-select">
+                <option value="low">נמוכה</option>
+                <option value="normal">רגילה</option>
+                <option value="high">גבוהה</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>תאריך יעד</label>
+              <input 
+                [(ngModel)]="newTask.dueDate" 
+                type="date" 
+                class="form-input">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="showForm.set(false)">ביטול</button>
+          <button class="btn-save" (click)="addTask()">שמור משימה</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">טוען משימות...</div>
+  }
+
+  <div class="kanban-board">
+    <div class="kanban-column">
+      <div class="column-header backlog">
+        <h3>לביצוע</h3>
+        <span class="task-count">{{ getTasksByStatus('todo').length }}</span>
+      </div>
+      <div class="column-content">
+        @for (task of getTasksByStatus('todo'); track task.id) {
+          <div class="task-card">
+            <div class="task-header">
+              <h4>{{ task.title }}</h4>
+              <button class="delete-btn" (click)="removeTask(task.id!)">×</button>
+            </div>
+            
+            <p class="task-description">{{ task.description }}</p>
+            
+            <div class="task-footer">
+              <span class="priority-badge" [class]="'priority-' + task.priority">
+                {{ getPriorityLabel(task.priority) }}
+              </span>
+              
+              @if (task.due_date) {
+                <span class="due-date">📅 {{ task.due_date | date:'dd/MM' }}</span>
+              }
+            </div>
+
+            <div class="task-actions">
+              <button 
+                class="action-btn move-right" 
+                (click)="changeStatus(task.id!, 'in_progress')">
+                ← בתהליך
+              </button>
+              <button 
+                class="action-btn comments" 
+                (click)="toggleComments(task.id!)">
+                💬 {{ activeTaskId() === task.id ? commentsCount() : 'תגובות' }}
+              </button>
+            </div>
+
+            @if (activeTaskId() === task.id) {
+              <div class="comments-section">
+                <div class="comments-list">
+                  @for (comment of currentComments(); track comment.id) {
+                    <div class="comment-item">
+                      <div class="comment-header">
+                        <strong>{{ getCommentUserName(comment) }}</strong>
+                        <span class="separator">•</span>
+                        <small>{{ comment.created_at | date:'dd/MM/yyyy HH:mm' }}</small>
+                      </div>
+                      <div class="comment-body">{{ comment.body }}</div>
+                    </div>
+                  } @empty {
+                    <p class="no-comments">אין תגובות</p>
+                  }
+                </div>
+                
+                <div class="add-comment">
+                  <input 
+                    #commentInput 
+                    type="text" 
+                    placeholder="הוסף תגובה..."
+                    (keyup.enter)="addComment(task.id!, commentInput.value); commentInput.value = ''">
+                  <button (click)="addComment(task.id!, commentInput.value); commentInput.value = ''">
+                    שלח
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="empty-column">אין משימות</div>
+        }
+      </div>
+    </div>
+
+    <div class="kanban-column">
+      <div class="column-header in-progress">
+        <h3>בתהליך</h3>
+        <span class="task-count">{{ getTasksByStatus('in_progress').length }}</span>
+      </div>
+      <div class="column-content">
+        @for (task of getTasksByStatus('in_progress'); track task.id) {
+          <div class="task-card">
+            <div class="task-header">
+              <h4>{{ task.title }}</h4>
+              <button class="delete-btn" (click)="removeTask(task.id!)">×</button>
+            </div>
+            
+            <p class="task-description">{{ task.description }}</p>
+            
+            <div class="task-footer">
+              <span class="priority-badge" [class]="'priority-' + task.priority">
+                {{ getPriorityLabel(task.priority) }}
+              </span>
+              
+              @if (task.due_date) {
+                <span class="due-date">📅 {{ task.due_date | date:'dd/MM' }}</span>
+              }
+            </div>
+
+            <div class="task-actions">
+              <button 
+                class="action-btn move-left" 
+                (click)="changeStatus(task.id!, 'todo')">
+                ← לביצוע
+              </button>
+              <button 
+                class="action-btn move-right" 
+                (click)="changeStatus(task.id!, 'done')">
+                הושלם →
+              </button>
+              <button 
+                class="action-btn comments" 
+                (click)="toggleComments(task.id!)">
+                💬 {{ activeTaskId() === task.id ? commentsCount() : 'תגובות' }}
+              </button>
+            </div>
+
+            @if (activeTaskId() === task.id) {
+              <div class="comments-section">
+                <div class="comments-list">
+                  @for (comment of currentComments(); track comment.id) {
+                    <div class="comment-item">
+                      <div class="comment-header">
+                        <strong>{{ getCommentUserName(comment) }}</strong>
+                        <span class="separator">•</span>
+                        <small>{{ comment.created_at | date:'dd/MM/yyyy HH:mm' }}</small>
+                      </div>
+                      <div class="comment-body">{{ comment.body }}</div>
+                    </div>
+                  } @empty {
+                    <p class="no-comments">אין תגובות</p>
+                  }
+                </div>
+                
+                <div class="add-comment">
+                  <input 
+                    #commentInput 
+                    type="text" 
+                    placeholder="הוסף תגובה..."
+                    (keyup.enter)="addComment(task.id!, commentInput.value); commentInput.value = ''">
+                  <button (click)="addComment(task.id!, commentInput.value); commentInput.value = ''">
+                    שלח
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="empty-column">אין משימות</div>
+        }
+      </div>
+    </div>
+
+    <div class="kanban-column">
+      <div class="column-header done">
+        <h3>בוצע</h3>
+        <span class="task-count">{{ getTasksByStatus('done').length }}</span>
+      </div>
+      <div class="column-content">
+        @for (task of getTasksByStatus('done'); track task.id) {
+          <div class="task-card completed">
+            <div class="task-header">
+              <h4>{{ task.title }}</h4>
+              <button class="delete-btn" (click)="removeTask(task.id!)">×</button>
+            </div>
+            
+            <p class="task-description">{{ task.description }}</p>
+            
+            <div class="task-footer">
+              <span class="priority-badge" [class]="'priority-' + task.priority">
+                {{ getPriorityLabel(task.priority) }}
+              </span>
+              
+              @if (task.due_date) {
+                <span class="due-date">📅 {{ task.due_date | date:'dd/MM' }}</span>
+              }
+            </div>
+
+            <div class="task-actions">
+              <button 
+                class="action-btn move-left" 
+                (click)="changeStatus(task.id!, 'in_progress')">
+                ← בתהליך
+              </button>
+              <button 
+                class="action-btn comments" 
+                (click)="toggleComments(task.id!)">
+                💬 {{ activeTaskId() === task.id ? commentsCount() : 'תגובות' }}
+              </button>
+            </div>
+
+            @if (activeTaskId() === task.id) {
+              <div class="comments-section">
+                <div class="comments-list">
+                  @for (comment of currentComments(); track comment.id) {
+                    <div class="comment-item">
+                      <div class="comment-header">
+                        <strong>{{ getCommentUserName(comment) }}</strong>
+                        <span class="separator">•</span>
+                        <small>{{ comment.created_at | date:'dd/MM/yyyy HH:mm' }}</small>
+                      </div>
+                      <div class="comment-body">{{ comment.body }}</div>
+                    </div>
+                  } @empty {
+                    <p class="no-comments">אין תגובות</p>
+                  }
+                </div>
+                
+                <div class="add-comment">
+                  <input 
+                    #commentInput 
+                    type="text" 
+                    placeholder="הוסף תגובה..."
+                    (keyup.enter)="addComment(task.id!, commentInput.value); commentInput.value = ''">
+                  <button (click)="addComment(task.id!, commentInput.value); commentInput.value = ''">
+                    שלח
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="empty-column">אין משימות</div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
