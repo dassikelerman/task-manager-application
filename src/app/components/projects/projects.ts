@@ -30,26 +30,20 @@ export class Projects implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadTeams();
-    
-    // טעינה ראשונית
     this.loadProjectsFromRoute();
     
-    // מאזין לשינויים בניווט - כל פעם שחוזרים לדף הזה
     this.navigationSubscription = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      // בודק אם אנחנו בדף פרויקטים
       if (this.router.url.includes('/teams/') && this.router.url.includes('/projects')) {
         this.loadProjectsFromRoute();
       }
     });
     
-    // מאזין גם לשינויים ב-route params
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const idFromUrl = params.get('id');
       if (idFromUrl) {
         const newTeamId = Number(idFromUrl);
-        // רק אם ה-teamId השתנה - טוען מחדש
         if (this.teamId() !== newTeamId) {
           this.teamId.set(newTeamId);
           this.loadProjects();
@@ -81,10 +75,10 @@ export class Projects implements OnInit, OnDestroy {
     const id = this.teamId();
     if (!id) return;
 
-    // תמיד מראה loading כשטוען פרויקטים
     this.isLoading.set(true);
-    // מנקה את הפרויקטים הישנים
-    this.projects.set([]);
+    
+    // הבעיה נפתרה כאן: הסרתי את (this.projects.set([])) 
+    // כדי למנוע היעלמות פרויקטים בזמן חזרה אחורה.
 
     this.projectsService.getProjectsByTeam(id).subscribe({
       next: (data) => {
@@ -114,6 +108,7 @@ export class Projects implements OnInit, OnDestroy {
     const id = this.teamId();
     if (!id) return '';
     const team = this.teams().find(t => t.id === id);
-    return team?.name || '';
+    // הבעיה נפתרה כאן: אם השם עדיין לא קיים במערך ה-teams, מחזירים טקסט טעינה
+    return team ? team.name : 'טוען צוות...';
   }
 }
