@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class BaseService {
   private http = inject(HttpClient);
-  public readonly apiUrl = 'http://localhost:3000/api'; 
+  public readonly apiUrl = 'https://wolftasksserver-0unp.onrender.com/'; 
 
   checkHealth() {
     return this.http.get(`${this.apiUrl}/health`);
