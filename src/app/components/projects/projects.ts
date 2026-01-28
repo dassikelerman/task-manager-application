@@ -1,11 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router'; 
+import { ActivatedRoute, RouterLink } from '@angular/router'; 
 import { ProjectsService } from '../../services/projects.service';
 import { TeamsService } from '../../services/teams.service';
 import { Project, Team } from '../../models/models';
 import { FormsModule } from '@angular/forms';
-import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-projects',
@@ -14,9 +13,8 @@ import { filter } from 'rxjs';
   templateUrl: './projects.html',
   styleUrl: './projects.css',
 })
-export class Projects implements OnInit {
+export class Projects implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private projectsService = inject(ProjectsService);
   private teamsService = inject(TeamsService);
   
@@ -27,26 +25,17 @@ export class Projects implements OnInit {
   showAddForm = signal(false);
 
   ngOnInit() {
-    // טוען בפעם הראשונה
-    this.loadTeamsAndProjects();
-    
-    // מאזין לניווט - כל פעם שעוברים לעמוד הזה, טוען מחדש
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      if (this.router.url.includes('/teams/') && this.router.url.includes('/projects')) {
-        this.loadTeamsAndProjects();
-      }
-    });
-  }
-
-  loadTeamsAndProjects() {
+    console.log('🔵 ngOnInit נטען!'); // בדיקה
     const idFromUrl = this.route.snapshot.paramMap.get('id');
     if (idFromUrl) {
       this.teamId.set(Number(idFromUrl));
       this.loadTeams();
       this.loadProjects();
     }
+  }
+
+  ngAfterViewInit() {
+    console.log('🟢 ngAfterViewInit נטען!'); // בדיקה נוספת
   }
 
   loadTeams() {
@@ -56,12 +45,14 @@ export class Projects implements OnInit {
   }
 
   loadProjects() {
+    console.log('📁 loadProjects רץ!', 'teamId:', this.teamId()); // בדיקה
     const id = this.teamId();
     if (!id) return;
 
     this.isLoading.set(true);
     this.projectsService.getProjectsByTeam(id).subscribe({
       next: (data) => {
+        console.log('✅ קיבלנו נתונים:', data); // בדיקה
         const filteredData = data.filter((p: Project) => p.team_id === id);
         this.projects.set(filteredData);
         this.isLoading.set(false);
