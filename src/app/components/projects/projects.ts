@@ -53,22 +53,17 @@ export class Projects implements OnInit, AfterViewInit {
   this.projectsService.getProjectsByTeam(id).subscribe({
     next: (data) => {
       console.log('✅ קיבלנו נתונים מהשרת:', data);
-      console.log('🔍 הפרויקט הראשון:', data[0]);
-      console.log('🔍 teamId שאנחנו מחפשים:', id);
+      console.log('📦 מעדכן signal עם:', data.length, 'פרויקטים');
       
-      const filteredData = data.filter((p: Project) => {
-        console.log('🔎 בודק פרויקט:', p.name, 'p.team_id:', p.team_id, 'id:', id, 'שווה?', p.team_id === id);
-        return p.team_id === id;
-      });
+      // ללא filter! רק שמים הכל!
+      this.projects.set(data);
       
-      console.log('📦 אחרי filter:', filteredData);
-      this.projects.set(filteredData);
+      console.log('🎯 Signal עכשיו מכיל:', this.projects().length, 'פרויקטים');
       this.isLoading.set(false);
     },
     error: () => this.isLoading.set(false)
   });
 }
-
   addProject(name: string, description: string) {
     const id = this.teamId();
     if (!id || !name) return;
