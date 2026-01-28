@@ -1,11 +1,11 @@
-import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router'; 
+import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router'; 
 import { ProjectsService } from '../../services/projects.service';
 import { TeamsService } from '../../services/teams.service';
 import { Project, Team } from '../../models/models';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-projects',
@@ -14,11 +14,11 @@ import { Subscription } from 'rxjs';
   templateUrl: './projects.html',
   styleUrl: './projects.css',
 })
-export class Projects implements OnInit, OnDestroy {
+export class Projects implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private projectsService = inject(ProjectsService);
   private teamsService = inject(TeamsService);
-  private routeSubscription?: Subscription;
   
   projects = signal<Project[]>([]);
   teams = signal<Team[]>([]);
@@ -27,19 +27,26 @@ export class Projects implements OnInit, OnDestroy {
   showAddForm = signal(false);
 
   ngOnInit() {
-    this.loadTeams();
+    // טוען בפעם הראשונה
+    this.loadTeamsAndProjects();
     
-    this.routeSubscription = this.route.paramMap.subscribe(params => {
-      const idFromUrl = params.get('id');
-      if (idFromUrl) {
-        this.teamId.set(Number(idFromUrl));
-        this.loadProjects();
+    // מאזין לניווט - כל פעם שעוברים לעמוד הזה, טוען מחדש
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      if (this.router.url.includes('/teams/') && this.router.url.includes('/projects')) {
+        this.loadTeamsAndProjects();
       }
     });
   }
 
-  ngOnDestroy() {
-    this.routeSubscription?.unsubscribe();
+  loadTeamsAndProjects() {
+    const idFromUrl = this.route.snapshot.paramMap.get('id');
+    if (idFromUrl) {
+      this.teamId.set(Number(idFromUrl));
+      this.loadTeams();
+      this.loadProjects();
+    }
   }
 
   loadTeams() {
