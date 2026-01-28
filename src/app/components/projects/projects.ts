@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router'; 
 import { ProjectsService } from '../../services/projects.service';
 import { TeamsService } from '../../services/teams.service';
 import { Project, Team } from '../../models/models';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-projects',
@@ -13,10 +14,11 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './projects.html',
   styleUrl: './projects.css',
 })
-export class Projects implements OnInit {
+export class Projects implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private projectsService = inject(ProjectsService);
   private teamsService = inject(TeamsService);
+  private routeSubscription?: Subscription;
   
   projects = signal<Project[]>([]);
   teams = signal<Team[]>([]);
@@ -25,12 +27,19 @@ export class Projects implements OnInit {
   showAddForm = signal(false);
 
   ngOnInit() {
-    const idFromUrl = this.route.snapshot.paramMap.get('id');
-    if (idFromUrl) {
-      this.teamId.set(Number(idFromUrl));
-      this.loadTeams();
-      this.loadProjects();
-    }
+    this.loadTeams();
+    
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const idFromUrl = params.get('id');
+      if (idFromUrl) {
+        this.teamId.set(Number(idFromUrl));
+        this.loadProjects();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.routeSubscription?.unsubscribe();
   }
 
   loadTeams() {
@@ -46,7 +55,6 @@ export class Projects implements OnInit {
     this.isLoading.set(true);
     this.projectsService.getProjectsByTeam(id).subscribe({
       next: (data) => {
-        // תוקן - ללא any, משתמש בטיפוס Project
         const filteredData = data.filter((p: Project) => p.team_id === id);
         this.projects.set(filteredData);
         this.isLoading.set(false);
