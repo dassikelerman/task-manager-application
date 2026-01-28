@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
@@ -10,27 +10,27 @@ import { Auth } from '../../services/auth';
   templateUrl: './header.html',
   styleUrls: ['./header.css']
 })
-export class Header implements OnInit {
+export class Header {
   private authService = inject(Auth);
   private router = inject(Router);
-  
+
+  // ✅ מחובר ישירות ל-signal (ריאקטיבי!)
+  isAuthenticated = computed(() => this.authService.isLoggedInSignal());
+
   userName: string = '';
-  isAuthenticated: boolean = false;
   showUserMenu: boolean = false;
-  
-  ngOnInit() {
-    this.isAuthenticated = this.authService.isLoggedInSignal();
-    
+
+  constructor() {
     const currentUser = this.authService.currentUserValue();
     if (currentUser) {
       this.userName = currentUser.name || 'משתמש';
     }
   }
-  
+
   toggleUserMenu() {
     this.showUserMenu = !this.showUserMenu;
   }
-  
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
