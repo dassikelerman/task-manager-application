@@ -17,9 +17,20 @@
     <span class="nav-icon">📊</span><span>לוח בקרה</span>
   </a>
 
-  <a routerLink="/projects" routerLinkActive="active" class="nav-link" style="pointer-events: none;">
-    <span class="nav-icon">📁</span><span>פרויקטים</span>
-  </a>
+  <a routerLink="/projects"
+   routerLinkActive="active"
+   [routerLinkActiveOptions]="{ exact: false }"
+   class="nav-link"
+   style="pointer-events: none;">
+  <span class="nav-icon">📁</span><span>פרויקטים</span>
+</a>
+  <a routerLink="/tasks"
+   routerLinkActive="active"
+   [routerLinkActiveOptions]="{ exact: false }"
+   class="nav-link"
+   style="pointer-events: none;">
+  <span class="nav-icon">📝</span><span>משימות</span>
+</a>
 </nav>
 
     <!-- אזור המשתמש -->
