@@ -1,0 +1,7 @@
+<div class="error-banner" *ngIf="message()" dir="rtl">
+  <div class="inner" role="status" aria-live="polite">
+    <div class="label">שגיאה טכנית</div>
+    <div class="text">{{ message() }}</div>
+    <button class="close" aria-label="סגור הודעה" (click)="close()">×</button>
+  </div>
+</div>

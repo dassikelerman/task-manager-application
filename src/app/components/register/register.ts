@@ -1,4 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
+import { ErrorService } from '../../services/error.service';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
@@ -14,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class Register {
   private authService = inject(Auth);
   private router = inject(Router);
+  private errorService = inject(ErrorService);
 
   name = '';
   email = '';
@@ -39,7 +41,7 @@ export class Register {
         },
         error: () => {
           this.isLoading = false;
-          alert('אופס! ההרשמה נכשלה. נסה שוב.');
+          this.errorService.show('אופס! ההרשמה נכשלה. נסה שנית');
         }
       });
     }

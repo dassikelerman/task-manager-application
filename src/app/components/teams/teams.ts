@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { ErrorService } from '../../services/error.service';
 import { CommonModule } from '@angular/common';
 import { TeamsService } from '../../services/teams.service';
 import { Team } from '../../models/models';
@@ -13,6 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class Teams implements OnInit{
   private teamsService = inject(TeamsService);
+  private errorService = inject(ErrorService);
   teams = signal<Team[]>([]);
   isLoading = signal<boolean>(false);
   
@@ -51,7 +53,7 @@ export class Teams implements OnInit{
   addMemberToTeam(teamId: number, userId: string) {
     const userIdNumber = parseInt(userId);
     if (!userIdNumber || isNaN(userIdNumber)) {
-      alert('נא להזין מספר ID תקין');
+      this.errorService.show('נא להזין מספר ID תקין');
       return;
     }
 
@@ -63,7 +65,7 @@ export class Teams implements OnInit{
       },
       error: (err) => {
         console.error('שגיאה בהוספת חבר לצוות', err);
-        alert('שגיאה בהוספת חבר לצוות');
+        this.errorService.show('שגיאה בהוספת חבר לצוות - נסה שנית');
       }
     });
   }
