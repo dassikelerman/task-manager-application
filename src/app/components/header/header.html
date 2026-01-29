@@ -8,21 +8,22 @@
     </div>
     
 <nav class="header-nav">
-  <a routerLink="/teams" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-    <span class="nav-icon">👥</span><span>צוותים</span>
-  </a>
+  <div class="nav-link" [class.active]="isActiveSection('teams')">
+  <span class="nav-icon">👥</span><span>צוותים</span>
+</div>
 
-  <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-    <span class="nav-icon">📊</span><span>לוח בקרה</span>
-  </a>
+<div class="nav-link" [class.active]="isActiveSection('dashboard')">
+  <span class="nav-icon">📊</span><span>לוח בקרה</span>
+</div>
 
-  <a routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="nav-link">
-    <span class="nav-icon">📁</span><span>פרויקטים</span>
-  </a>
+<div class="nav-link" [class.active]="isActiveSection('projects')">
+  <span class="nav-icon">📁</span><span>פרויקטים</span>
+</div>
 
-  <a routerLink="/tasks" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="nav-link">
-    <span class="nav-icon">📝</span><span>משימות</span>
-  </a>
+<div class="nav-link" [class.active]="isActiveSection('tasks')">
+  <span class="nav-icon">📝</span><span>משימות</span>
+</div>
+
 </nav>
 
 

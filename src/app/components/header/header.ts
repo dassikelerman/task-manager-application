@@ -29,4 +29,26 @@ export class Header {
     this.router.navigate(['/login']);
     this.showUserMenu = false;
   }
+
+isActiveSection(section: 'teams' | 'dashboard' | 'projects' | 'tasks') {
+  const url = this.router.url; // URL מלא
+  const segments = url.split('/').filter(s => s);
+
+  switch (section) {
+    case 'teams':
+      // אם הנתיב מכיל "teams" אבל לא מכיל "projects" או "tasks" בתחילת החלקים הנוספים
+      return segments.includes('teams') && !segments.includes('projects') && !segments.includes('tasks');
+    case 'dashboard':
+      return segments.includes('dashboard');
+    case 'projects':
+      // אם הנתיב מכיל "projects" אך לא "tasks"
+      return segments.includes('projects') && !segments.includes('tasks');
+    case 'tasks':
+      return segments.includes('tasks');
+    default:
+      return false;
+  }
+}
+
+
 }
