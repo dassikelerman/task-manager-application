@@ -1,0 +1,35 @@
+[33m20f36f7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m lastJWT2
+[33m01193a6[m lastCommitJWT
+[33m477ddc3[m lastOfAll
+[33m411e717[m lasttttt
+[33ma2f1a89[m lastlast4
+[33m95b8764[m lastlast3
+[33mcdfa748[m lastlast2
+[33m1947c7a[m lastlast
+[33mdaa7892[m lastOne
+[33m472bfd2[m fix2
+[33m480fcf3[m fix
+[33m55bbec4[m fix: make header reactive using auth signal
+[33m57abb57[m fix
+[33mbd5d499[m Update projects.html
+[33ma21cdf1[m Update projects.ts
+[33m9031e45[m Fix missing newline at end of projects.html
+[33me8bf5ba[m Fix project loading behavior on navigation
+[33me2e5fec[m Refactor project loading and navigation handling
+[33mfe48b59[m Enhance loadProjects with debug logging
+[33mf13e75b[m Refactor Projects component to manage route changes
+[33m0e9db67[m Refactor loadProjects and clean up console logs
+[33m4b90900[m Refactor loadProjects method for clarity
+[33m857425e[m Simplify project data handling in projects.ts
+[33m470af46[m Improve loadProjects with detailed logging
+[33m6dfa0fe[m Add AfterViewInit lifecycle hook to Projects component
+[33md9e08e8[m Refactor Projects component for improved navigation
+[33m6d50372[m Enhance Projects component with OnDestroy lifecycle
+[33m9f14465[m Add OnInit to Register component
+[33madf0611[m Add OnInit implementation to Login component
+[33m054cd5c[m Redirect root path to 'teams' instead of 'login'
+[33me32b13e[m Update apiUrl to include '/api' endpoint
+[33m37925f8[m Remove trailing slash from apiUrl
+[33mc533cb2[m Update apiUrl to production server
+[33m661af00[m Initial commit - project ready for deploy
+[33m85bba64[m initial commit
