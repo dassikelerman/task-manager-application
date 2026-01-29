@@ -11,14 +11,15 @@ export class Auth {
   private base = inject(BaseService);
   private apiUrl = `${this.base.apiUrl}/auth`;
   
-  isLoggedInSignal = signal<boolean>(!!localStorage.getItem('token'));
+  // ⚡ signal בודק אם המשתמש מחובר
+  isLoggedInSignal = signal<boolean>(!!sessionStorage.getItem('token'));
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(tap(response => {
         this.saveToken(response.token);
         if (response.user) {
-          localStorage.setItem('user', JSON.stringify(response.user));
+          sessionStorage.setItem('user', JSON.stringify(response.user));
         }
         this.isLoggedInSignal.set(true); 
       }));
@@ -29,28 +30,28 @@ export class Auth {
       .pipe(tap(response => {
         this.saveToken(response.token);
         if (response.user) {
-          localStorage.setItem('user', JSON.stringify(response.user));
+          sessionStorage.setItem('user', JSON.stringify(response.user));
         }
         this.isLoggedInSignal.set(true); 
       }));
   }
 
   saveToken(token: string): void { 
-    localStorage.setItem('token', token); 
+    sessionStorage.setItem('token', token); 
   }
   
   getToken(): string | null { 
-    return localStorage.getItem('token'); 
+    return sessionStorage.getItem('token'); 
   }
 
   currentUserValue(): User | null {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
     return user ? JSON.parse(user) as User : null;
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     this.isLoggedInSignal.set(false); 
   }
 }
