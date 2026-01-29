@@ -7,22 +7,21 @@
       <h1 class="brand-title">מנהל משימות</h1>
     </div>
     
-    <!-- תפריט ניווט -->
+    <!-- ניווט ראשי -->
     <nav class="header-nav">
-      <span routerLinkActive="active" class="nav-link nav-indicator">
-        <span class="nav-icon">👥</span>
-        <span>צוותים</span>
-      </span>
-      <span routerLinkActive="active" class="nav-link nav-indicator">
-        <span class="nav-icon">📊</span>
-        <span>לוח בקרה</span>
-      </span>
-      <span routerLinkActive="active" class="nav-link nav-indicator">
-        <span class="nav-icon">📁</span>
-        <span>פרויקטים</span>
-      </span>
-    </nav>
-    
+     <a routerLink="/teams" routerLinkActive="active" class="nav-link" style="pointer-events: none;">
+    <span class="nav-icon">👥</span>
+    <span>צוותים</span>
+      </a>
+     <a routerLink="/teams" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" class="nav-link" style="pointer-events: none;">
+    <span class="nav-icon">📊</span>
+    <span>לוח בקרה</span>
+      </a>
+     <a routerLink="/teams" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" class="nav-link" style="pointer-events: none;">
+    <span class="nav-icon">📁</span>
+    <span>פרויקטים</span>
+      </a>
+      </nav>
     <!-- אזור המשתמש -->
     <div class="header-user">
       <div class="user-menu">
