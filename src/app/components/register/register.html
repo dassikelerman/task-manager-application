@@ -1,11 +1,10 @@
 <div class="auth-container" dir="rtl">
   <div class="auth-card">
-    
     <div class="auth-header">
+      <div class="brand-logo">M</div>
       <div class="app-header-title">
         <h1>מנהל המשימות</h1>
       </div>
-
       <div class="auth-step-info">
         <h2 class="auth-title">ברוך הבא</h2>
         <p class="auth-subtitle">צור חשבון חדש כדי להתחיל</p>
@@ -15,37 +14,16 @@
     <form class="auth-form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label class="form-label">שם מלא</label>
-        <input 
-          type="text" 
-          [(ngModel)]="name" 
-          name="name"
-          placeholder="השם שלך"
-          class="form-input"
-          required>
+        <input type="text" [(ngModel)]="name" name="name" placeholder="השם שלך" class="form-input" required>
       </div>
-
       <div class="form-group">
         <label class="form-label">אימייל</label>
-        <input 
-          type="email" 
-          [(ngModel)]="email" 
-          name="email"
-          placeholder="your@email.com"
-          class="form-input"
-          required>
+        <input type="email" [(ngModel)]="email" name="email" placeholder="your@email.com" class="form-input" required>
       </div>
-
       <div class="form-group">
         <label class="form-label">סיסמה</label>
-        <input 
-          type="password" 
-          [(ngModel)]="password" 
-          name="password"
-          placeholder="••••••••"
-          class="form-input"
-          required>
+        <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" class="form-input" required>
       </div>
-
       <button type="submit" class="btn-submit" [disabled]="isLoading">
         <span *ngIf="!isLoading">הירשם</span>
         <div *ngIf="isLoading" class="spinner-container">

@@ -1,11 +1,10 @@
 <div class="auth-container" dir="rtl">
   <div class="auth-card">
-    
     <div class="auth-header">
+      <div class="brand-logo">M</div>
       <div class="app-header-title">
         <h1>מנהל המשימות</h1>
       </div>
-
       <div class="auth-step-info">
         <h2 class="auth-title">ברוך שובך</h2>
         <p class="auth-subtitle">התחבר לחשבון שלך</p>
@@ -15,26 +14,12 @@
     <form class="auth-form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label class="form-label">אימייל</label>
-        <input 
-          type="email" 
-          [(ngModel)]="email" 
-          name="email"
-          placeholder="Enter your email"
-          class="form-input"
-          required>
+        <input type="email" [(ngModel)]="email" name="email" placeholder="Enter your email" class="form-input" required>
       </div>
-
       <div class="form-group">
         <label class="form-label">סיסמה</label>
-        <input 
-          type="password" 
-          [(ngModel)]="password" 
-          name="password"
-          placeholder="Enter your password"
-          class="form-input"
-          required>
+        <input type="password" [(ngModel)]="password" name="password" placeholder="Enter your password" class="form-input" required>
       </div>
-
       <button type="submit" class="btn-submit" [disabled]="isLoading">
         <span *ngIf="!isLoading">התחבר</span>
         <div *ngIf="isLoading" class="spinner-container">
