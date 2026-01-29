@@ -38,7 +38,13 @@
           required>
       </div>
 
-      <button type="submit" class="btn-submit">התחבר</button>
+      <button type="submit" class="btn-submit" [disabled]="isLoading">
+        <span *ngIf="!isLoading">התחבר</span>
+        <div *ngIf="isLoading" class="spinner-container">
+          <span class="spinner"></span>
+          <span>מתחבר...</span>
+        </div>
+      </button>
     </form>
 
     <div class="auth-footer">

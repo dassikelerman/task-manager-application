@@ -18,12 +18,11 @@ export class Register {
   name = '';
   email = '';
   password = '';
+  isLoading = false; // חיווי טעינה
 
-  // 🔹 ריאקטיביות: מאזין ל־signal של התחברות
   isAuthenticated = computed(() => this.authService.isLoggedInSignal());
 
   constructor() {
-    // אם כבר מחובר, מפנה אוטומטית לדף הצוותים
     if (this.isAuthenticated()) {
       this.router.navigate(['/teams']);
     }
@@ -31,12 +30,15 @@ export class Register {
 
   onSubmit() {
     if (this.name && this.email && this.password) {
+      this.isLoading = true; // הפעלת מצב טעינה
+      
       this.authService.register(this.name, this.email, this.password).subscribe({
         next: () => {
-          // signal מתעדכן → כל ה‑UI ריאקטיבי
+          this.isLoading = false;
           this.router.navigate(['/teams']);
         },
         error: () => {
+          this.isLoading = false;
           alert('אופס! ההרשמה נכשלה. נסה שוב.');
         }
       });
