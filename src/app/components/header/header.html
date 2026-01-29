@@ -1,10 +1,13 @@
 <header class="app-header" *ngIf="isAuthenticated()" dir="rtl">
   <div class="header-container">
+    
+    <!-- לוגו ושם המותג -->
     <div class="header-brand">
       <div class="brand-logo">M</div>
       <h1 class="brand-title">מנהל משימות</h1>
     </div>
     
+    <!-- תפריט ניווט -->
     <nav class="header-nav">
       <a routerLink="/teams" routerLinkActive="active" class="nav-link">
         <span class="nav-icon">👥</span>
@@ -20,23 +23,29 @@
       </a>
     </nav>
     
+    <!-- אזור המשתמש -->
     <div class="header-user">
       <div class="user-menu">
+        
+        <!-- כפתור פתיחת dropdown -->
         <button class="user-info" (click)="toggleUserMenu()">
           <div class="user-avatar">
-            {{ userName.charAt(0).toUpperCase() }}
+            {{ userName().charAt(0).toUpperCase() }}
           </div>
-          <span class="user-name">{{ userName }}</span>
+          <span class="user-name">{{ userName() }}</span>
           <span class="dropdown-arrow">▼</span>
         </button>
         
+        <!-- התפריט הנפתח -->
         <div class="user-dropdown" *ngIf="showUserMenu">
           <button class="dropdown-item logout-item" (click)="logout()">
             <span class="logout-icon">⎋</span>
             <span>התנתק</span>
           </button>
         </div>
+        
       </div>
     </div>
+    
   </div>
 </header>

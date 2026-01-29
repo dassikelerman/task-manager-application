@@ -14,18 +14,11 @@ export class Header {
   private authService = inject(Auth);
   private router = inject(Router);
 
-  // ✅ מחובר ישירות ל-signal (ריאקטיבי!)
+  // ✅ ריאקטיבי לחלוטין
   isAuthenticated = computed(() => this.authService.isLoggedInSignal());
+  userName = computed(() => this.authService.currentUserValue()?.name || 'משתמש');
 
-  userName: string = '';
-  showUserMenu: boolean = false;
-
-  constructor() {
-    const currentUser = this.authService.currentUserValue();
-    if (currentUser) {
-      this.userName = currentUser.name || 'משתמש';
-    }
-  }
+  showUserMenu = false;
 
   toggleUserMenu() {
     this.showUserMenu = !this.showUserMenu;

@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';  // ← שימי לב! הוספתי OnInit
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
+import {  computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,17 +10,21 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, RouterLink, CommonModule],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css'],
 })
-export class Login implements OnInit {  // ← הוספתי implements OnInit
+export class Login {
   private authService = inject(Auth);
   private router = inject(Router);
+
   email = '';
   password = '';
 
-  ngOnInit() {
-    // בודק אם המשתמש כבר מחובר
-    if (this.authService.isLoggedInSignal()) {
+  // ✅ signal ישיר מה־AuthService
+  isLoggedIn = computed(() => this.authService.isLoggedInSignal());
+
+  constructor() {
+    // אם כבר מחובר, נווט מייד
+    if (this.isLoggedIn()) {
       this.router.navigate(['/teams']);
     }
   }
@@ -28,11 +33,12 @@ export class Login implements OnInit {  // ← הוספתי implements OnInit
     if (this.email && this.password) {
       this.authService.login(this.email, this.password).subscribe({
         next: (response) => {
+          // signal משתנה אוטומטית → Header יתעדכן
           this.router.navigate(['/teams']);
         },
         error: (err) => {
           alert('אופס! המייל או הסיסמה לא נכונים.');
-        }
+        },
       });
     }
   }
