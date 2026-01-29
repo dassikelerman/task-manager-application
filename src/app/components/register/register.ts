@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';  // ← הוספתי OnInit
+import { Component, inject, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
@@ -11,16 +11,20 @@ import { CommonModule } from '@angular/common';
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register implements OnInit {  // ← הוספתי implements OnInit
+export class Register {
   private authService = inject(Auth);
   private router = inject(Router);
+
   name = '';
   email = '';
   password = '';
 
-  ngOnInit() {
-    // בודק אם המשתמש כבר מחובר
-    if (this.authService.isLoggedInSignal()) {
+  // 🔹 ריאקטיביות: מאזין ל־signal של התחברות
+  isAuthenticated = computed(() => this.authService.isLoggedInSignal());
+
+  constructor() {
+    // אם כבר מחובר, מפנה אוטומטית לדף הצוותים
+    if (this.isAuthenticated()) {
       this.router.navigate(['/teams']);
     }
   }
@@ -28,10 +32,11 @@ export class Register implements OnInit {  // ← הוספתי implements OnInit
   onSubmit() {
     if (this.name && this.email && this.password) {
       this.authService.register(this.name, this.email, this.password).subscribe({
-        next: (response) => {
+        next: () => {
+          // signal מתעדכן → כל ה‑UI ריאקטיבי
           this.router.navigate(['/teams']);
         },
-        error: (err) => {
+        error: () => {
           alert('אופס! ההרשמה נכשלה. נסה שוב.');
         }
       });
