@@ -11,7 +11,6 @@ export class Auth {
   private base = inject(BaseService);
   private apiUrl = `${this.base.apiUrl}/auth`;
   
-  // ⚡ signal בודק אם המשתמש מחובר
   isLoggedInSignal = signal<boolean>(!!sessionStorage.getItem('token'));
 
   login(email: string, password: string): Observable<AuthResponse> {
